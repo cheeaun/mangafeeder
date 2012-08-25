@@ -200,4 +200,4 @@ var server = http.createServer(function(req, res){
 	});
 });
 
-server.listen(nconf.get('app_port') || 80);
+server.listen(process.env.app_port || 80);
