@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mangafeeder</title>
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.0/css/bootstrap-combined.min.css">
+<div class="container">
+	<header>
+		<h1>Mangafeeder</h1>
+		<p>Latest manga chapters from <a href="http://mangareader.net">Mangareader.net</a>, available in JSON and RSS formats.</p>
+	</header>
+	<section>
+		<form class="form-horizontal" id="generate-form">
+			<legend>Generate JSON/RSS link</legend>
+			<div class="control-group">
+				<label class="control-label"><strong>URL</strong></label>
+				<div class="controls">
+					<a id="generated-url" href="#" style="font-size: 24px; display: inline-block; margin-top: 4px;" target="_blank"></a>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Format</label>
+				<div class="controls">
+					<label class="radio inline"><input type="radio" name="format" value="json" checked> JSON</label>
+					<label class="radio inline"><input type="radio" name="format" value="rss"> RSS</label>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Limit</label>
+				<div class="controls">
+					<input type="number" max="100" min="1" value="20" name="limit">
+					<span class="help-block">Between 1 to 100.</span>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Anime Filters</label>
+				<div class="controls">
+					<input type="search" class="search-query" name="filter">
+					<ul class="help-block">
+						<li>E.g.: <samp>naruto,bleach,one-piece</samp> will only list latest Naruto, Bleach and One Piece chapters. Comma-separated.</li>
+						<li>Each value will be matched against the URL slugs of the manga pages on mangareader.net.</li>
+						<li>Leave blank to show all.</li>
+					</ul>
+				</div>
+			</div>
+			<div class="form-actions">
+				<button class="btn btn-primary">Generate URL</button>&nbsp;&nbsp;&nbsp;
+				<button type="reset" class="btn">Reset</button>
+			</div>
+		</form>
+	</section>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js"></script>
+<script>
+var $form = $('#generate-form'),
+	$generatedURL = $('#generated-url');
+$form.submit(function(e){
+	e.preventDefault();
+	var data = $form.serializeArray(),
+		format = 'json',
+		params = null;
+	for (var i=0, l=data.length; i<l; i++){
+		var d = data[i],
+			name = d.name,
+			value = d.value;
+		if (name){
+			if (name == 'format'){
+				format = value;
+			} else if ((name == 'limit' && value && value != '20') || (name == 'filter' && value)){
+				if (!params) params = {};
+				params[name] = value;
+			}
+		}
+	}
+	var url = 'http://' + location.host + '/latest.' + format + (params ? '?' + $.param(params) : '');
+	$generatedURL.text(url).attr('href', url);
+}).submit();
+</script>
