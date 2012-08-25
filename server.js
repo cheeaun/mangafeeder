@@ -83,7 +83,7 @@ var router = new director.http.Router().configure({
 router.get('/', function(){
 	this.res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
 	var r = this;
-	fs.readFile('index.html', function(e, content){
+	fs.readFile(__dirname + '/index.html', function(e, content){
 		r.res.end(content);
 	});
 });
