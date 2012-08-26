@@ -5,18 +5,18 @@ var http = require('http'),
 	url = require('url'),
 	fs = require('fs'),
 	RSS = require('rss'),
-	moment = require('moment');
+	moment = require('moment'),
+	cache = require('memory-cache');
 
 var ROOT_DOMAIN = 'http://www.mangareader.net';
-var UPDATES = [];
 var update = function(){
-	console.log('Updating manga updates.');
+	console.log(moment().format() + ' Updating manga updates.');
 	var _UPDATES = [];
 
 	request(ROOT_DOMAIN + '/latest', function(error, response, body){
 		if (error || response.statusCode != 200){
 			console.error(error);
-			setTimeout(update, 5*60*1000); // 5 minutes
+			setTimeout(update, 1*60*1000); // 1 minutes
 			return;
 		}
 		var $ = cheerio.load(body);
@@ -67,9 +67,9 @@ var update = function(){
 				date: date
 			});
 		});
-
-		UPDATES = _UPDATES;
-		console.log('Updates updated.');
+		
+		cache.put('updates', _UPDATES);
+		console.log(moment().format() + ' Updates updated.');
 	});
 
 	setTimeout(update, 30*60*1000); // 30 minutes
@@ -83,9 +83,19 @@ var router = new director.http.Router().configure({
 router.get('/', function(){
 	this.res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
 	var r = this;
-	fs.readFile(__dirname + '/index.html', function(e, content){
+	var content = cache.get('index');
+	if (content){
 		r.res.end(content);
-	});
+	} else {
+		fs.readFile(__dirname + '/index.html', function(e, content){
+			if (e){
+				console.error(e);
+				return;
+			}
+			r.res.end(content);
+			cache.put('index', content);
+		});
+	}
 });
 
 router.get('/search', function(q){
@@ -106,7 +116,8 @@ router.get(/\/latest\.(json|rss)/i, function(format, queries){
 	var filters = filter ? filter.split(',').map(function(f){
 		return f.trim().replace(/\s+/, '-');
 	}) : [];
-	var _UPDATES = filter ? UPDATES.filter(function(manga){
+	var _UPDATES = cache.get('updates');
+	if (filter) _UPDATES = cache.get('updates').filter(function(manga){
 		for (var i=0, l=filters.length; i<l; i++){
 			var f = filters[i];
 			if (manga.slug.indexOf(f) != -1){
@@ -114,72 +125,79 @@ router.get(/\/latest\.(json|rss)/i, function(format, queries){
 			}
 		}
 		return false;
-	}) : UPDATES;
+	});
 	_UPDATES = _UPDATES.slice(0, limit);
 
 	if (format.toLowerCase() == 'rss'){
-		var feed = new RSS({
-			title: 'Mangafeeder',
-			description: 'Latest manga chapters from Mangareader.net',
-			site_url: ROOT_DOMAIN,
-			feed_url: reqURL
-		});
+		var cacheKey = 'latest-' + reqURL;
+		var xml = cache.get(cacheKey);
+		if (!xml){
+			var feed = new RSS({
+				title: 'Mangafeeder',
+				description: 'Latest manga chapters from Mangareader.net',
+				site_url: ROOT_DOMAIN,
+				feed_url: reqURL
+			});
 
-		for (var i=0, l=_UPDATES.length; i<l; i++){
-			var manga = _UPDATES[i];
-			var date = manga.date;
-			if (/today/i.test(date)){
-				date = moment();
-			} else if (/yesterday/i.test(date)){
-				date = moment().subtract('days', 1);
-			} else {
-				date = moment(date);
-			}
-			var chapters = manga.chapters;
-
-			var item = {
-				description: (function(){
-						var html = '<a href="' + manga.url + '"><img src="' + manga.image_url +  '" alt=""></a><br>';
-						html += chapters.map(function(chapter){
-							return '<a href="' + chapter.url + '">' + chapter.title + '</a>';
-						}).join('<br>');
-						return html;
-					})(),
-				guid: (function(){
-						return chapters.map(function(chapter){
-							return chapter.url;
-						}).join(',');
-					})(),
-				date: date.toDate()
-			};
-
-			item.title = manga.title;
-			item.url = manga.url;
-			var chaptersLen = chapters.length;
-			if (chaptersLen > 1){
-				var chaptersNum = chapters.map(function(chapter){
-					return chapter.title.match(/\d+$/);
-				}).filter(function(num){
-					return num !== null;
-				}).reverse();
-				if (chaptersNum.length){
-					item.title += ' ' + chaptersNum.join(', ');
+			for (var i=0, l=_UPDATES.length; i<l; i++){
+				var manga = _UPDATES[i];
+				var date = manga.date;
+				if (/today/i.test(date)){
+					date = moment();
+				} else if (/yesterday/i.test(date)){
+					date = moment().subtract('days', 1);
+				} else {
+					date = moment(date);
 				}
-			} else if (chaptersLen == 1 && !manga.new){
-				var firstChapter = chapters[0];
-				item.title = firstChapter.title;
-				item.url = firstChapter.url;
-			}
-			if (manga.new) item.title += ' [NEW]';
-			if (manga.hot) item.title += ' [HOT]';
+				var chapters = manga.chapters;
 
-			feed.item(item);
+				var item = {
+					description: (function(){
+							var html = '<a href="' + manga.url + '"><img src="' + manga.image_url +  '" alt=""></a><br>';
+							html += chapters.map(function(chapter){
+								return '<a href="' + chapter.url + '">' + chapter.title + '</a>';
+							}).join('<br>');
+							return html;
+						})(),
+					guid: (function(){
+							return chapters.map(function(chapter){
+								return chapter.url;
+							}).join(',');
+						})(),
+					date: date.toDate()
+				};
+
+				item.title = manga.title;
+				item.url = manga.url;
+				var chaptersLen = chapters.length;
+				if (chaptersLen > 1){
+					var chaptersNum = chapters.map(function(chapter){
+						return chapter.title.match(/\d+$/);
+					}).filter(function(num){
+						return num !== null;
+					}).reverse();
+					if (chaptersNum.length){
+						item.title += ' ' + chaptersNum.join(', ');
+					}
+				} else if (chaptersLen == 1 && !manga.new){
+					var firstChapter = chapters[0];
+					item.title = firstChapter.title;
+					item.url = firstChapter.url;
+				}
+				if (manga.new) item.title += ' [NEW]';
+				if (manga.hot) item.title += ' [HOT]';
+
+				feed.item(item);
+			}
+
+			xml = feed.xml();
+			cache.put(cacheKey, xml, 15*60*1000); // 15 minutes
 		}
 
 		this.res.writeHead(200, {
 			'Content-Type': 'text/xml; charset=UTF-8'
 		});
-		this.res.end(feed.xml());
+		this.res.end(xml);
 	} else {
 		var content = JSON.stringify(_UPDATES);
 		this.res.writeHead(200, {
