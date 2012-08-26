@@ -3,10 +3,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mangafeeder</title>
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.0/css/bootstrap-combined.min.css">
+<link rel="shortcut icon" href="http://s5.mangareader.net/favicon.ico">
+<style>
+#generated-url{
+	font-size: 24px;
+	display: inline-block;
+	margin-top: 4px;
+}
+samp b{
+	background-color: yellow;
+}
+</style>
 <div class="container">
 	<header>
 		<h1>Mangafeeder</h1>
-		<p>Latest manga chapters from <a href="http://mangareader.net">Mangareader.net</a>, available in JSON and RSS formats.</p>
+		<p><a href="http://www.mangareader.net/latest">Latest manga chapters</a> from <a href="http://mangareader.net">Mangareader.net</a>, available in JSON and RSS formats.</p>
 	</header>
 	<section>
 		<form class="form-horizontal" id="generate-form">
@@ -14,7 +25,7 @@
 			<div class="control-group">
 				<label class="control-label"><strong>URL</strong></label>
 				<div class="controls">
-					<a id="generated-url" href="#" style="font-size: 24px; display: inline-block; margin-top: 4px;" target="_blank"></a>
+					<a id="generated-url" href="#" target="_blank"></a>
 				</div>
 			</div>
 			<div class="control-group">
@@ -27,17 +38,22 @@
 			<div class="control-group">
 				<label class="control-label">Limit</label>
 				<div class="controls">
-					<input type="number" max="100" min="1" value="20" name="limit">
-					<span class="help-block">Between 1 to 100.</span>
+					<input type="number" max="100" min="1" value="20" name="limit" class="input-mini">
+					<span class="help-block">Between 1 to 100. Default to 20.</span>
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label">Anime Filters</label>
 				<div class="controls">
-					<input type="search" class="search-query" name="filter">
+					<input type="text" name="filter" class="input-xxlarge">
 					<ul class="help-block">
-						<li>E.g.: <samp>naruto,bleach,one-piece</samp> will only list latest Naruto, Bleach and One Piece chapters. Comma-separated.</li>
-						<li>Each value will be matched against the URL slugs of the manga pages on mangareader.net.</li>
+						<li>E.g.: <samp><b>naruto,bleach,one-piece</b></samp> will only list latest Naruto, Bleach and One Piece chapters. Comma-separated.</li>
+						<li>Each value will be matched against the URL slugs of the manga pages on mangareader.net. E.g.:
+							<ul>
+								<li><samp>http://www.mangareader.net/<b>naruto</b></samp></li>
+								<li><samp>http://www.mangareader.net/103/<b>one-piece</b>.html</samp></li>
+							</ul>
+						</li>
 						<li>Leave blank to show all.</li>
 					</ul>
 				</div>
