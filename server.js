@@ -159,11 +159,6 @@ router.get(/\/latest\.(json|rss)/i, function(format, queries){
 							}).join('<br>');
 							return html;
 						})(),
-					guid: (function(){
-							return chapters.map(function(chapter){
-								return chapter.url;
-							}).join(',');
-						})(),
 					date: date.toDate()
 				};
 
