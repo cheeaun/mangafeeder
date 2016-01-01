@@ -2,8 +2,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mangafeeder</title>
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.0/css/bootstrap-combined.min.css">
-<link rel="shortcut icon" href="http://s5.mangareader.net/favicon.ico">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<link rel="shortcut icon" href="http://s4.mangareader.net/favicon.ico">
 <style>
 #generated-url{
 	font-size: 24px;
@@ -22,30 +22,30 @@ samp b{
 	<section>
 		<form class="form-horizontal" id="generate-form">
 			<legend>Generate JSON/RSS link</legend>
-			<div class="control-group">
-				<label class="control-label"><strong>URL</strong></label>
-				<div class="controls">
+			<div class="form-group">
+				<label class="col-sm-2 control-label"><strong>URL</strong></label>
+				<div class="col-sm-10">
 					<a id="generated-url" href="#" target="_blank"></a>
 				</div>
 			</div>
-			<div class="control-group">
-				<label class="control-label">Format</label>
-				<div class="controls">
-					<label class="radio inline"><input type="radio" name="format" value="json" checked> JSON</label>
-					<label class="radio inline"><input type="radio" name="format" value="rss"> RSS</label>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Format</label>
+				<div class="col-sm-10">
+					<label class="radio-inline"><input type="radio" name="format" value="json" checked> JSON</label>
+					<label class="radio-inline"><input type="radio" name="format" value="rss"> RSS</label>
 				</div>
 			</div>
-			<div class="control-group">
-				<label class="control-label">Limit</label>
-				<div class="controls">
-					<input type="number" max="100" min="1" value="20" name="limit" class="input-mini">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Limit</label>
+				<div class="col-sm-10">
+					<input type="number" max="100" min="1" value="20" name="limit" class="form-control">
 					<span class="help-block">Between 1 to 100. Default to 20.</span>
 				</div>
 			</div>
-			<div class="control-group">
-				<label class="control-label">Manga Filters</label>
-				<div class="controls">
-					<input type="text" name="filter" class="input-xxlarge">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Manga Filters</label>
+				<div class="col-sm-10">
+					<input type="text" name="filter" class="form-control">
 					<ul class="help-block">
 						<li>E.g.: <samp><b>naruto,bleach,one-piece</b></samp> will only list latest Naruto, Bleach and One Piece chapters. Comma-separated.</li>
 						<li>Each value will be matched against the URL slugs of the manga pages on mangareader.net. E.g.:
@@ -58,9 +58,11 @@ samp b{
 					</ul>
 				</div>
 			</div>
-			<div class="form-actions">
-				<button class="btn btn-primary">Generate URL</button>&nbsp;&nbsp;&nbsp;
-				<button type="reset" class="btn">Reset</button>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button class="btn btn-primary">Generate URL</button>&nbsp;&nbsp;&nbsp;
+					<button type="reset" class="btn">Reset</button>
+				</div>
 			</div>
 		</form>
 	</section>
