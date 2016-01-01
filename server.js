@@ -190,7 +190,7 @@ router.get(/\/latest\.(json|rss)/i, function(format, queries){
 		}
 
 		this.res.writeHead(200, {
-			'Content-Type': 'text/xml; charset=UTF-8'
+			'Content-Type': 'application/rss+xml; charset=utf-8'
 		});
 		this.res.end(xml);
 	} else {
