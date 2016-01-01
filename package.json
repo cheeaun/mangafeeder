@@ -1,7 +1,9 @@
 {
   "name": "mangafeeder",
   "version": "0.2.0",
-  "node": "0.8.1",
+  "engines": {
+    "node": "~4.2.4"
+  },
   "description": "Latest manga chapters from Mangareader.net",
   "dependencies": {
     "cheerio": "~0.19.0",
