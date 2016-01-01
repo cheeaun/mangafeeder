@@ -67,7 +67,7 @@ var update = function(){
 				date: date
 			});
 		});
-		
+
 		cache.put('updates', _UPDATES);
 		console.log(moment().format() + ' Updates updated.');
 	});
