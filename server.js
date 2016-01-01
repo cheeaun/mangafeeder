@@ -145,7 +145,7 @@ router.get(/\/latest\.(json|rss)/i, function(format, queries){
 				if (/today/i.test(date)){
 					date = moment();
 				} else if (/yesterday/i.test(date)){
-					date = moment().subtract('days', 1);
+					date = moment().subtract(1, 'days');
 				} else {
 					date = moment(date);
 				}
