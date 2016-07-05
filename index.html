@@ -14,38 +14,38 @@ samp b{
 	background-color: yellow;
 }
 </style>
-<div class="container">
+<div class="container" ng-app="MangaFeeder">
 	<header>
 		<h1>Mangafeeder</h1>
 		<p><a href="http://www.mangareader.net/latest">Latest manga chapters</a> from <a href="http://mangareader.net">Mangareader.net</a>, available in JSON and RSS formats.</p>
 	</header>
 	<section>
-		<form class="form-horizontal" id="generate-form">
+		<form class="form-horizontal" id="generate-form" ng-controller="FormController">
 			<legend>Generate JSON/RSS link</legend>
 			<div class="form-group">
 				<label class="col-sm-2 control-label"><strong>URL</strong></label>
 				<div class="col-sm-10">
-					<a id="generated-url" href="#" target="_blank"></a>
+					<a id="generated-url" href="{{link()}}" target="_blank">{{link()}}</a>
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="col-sm-2 control-label">Format</label>
 				<div class="col-sm-10">
-					<label class="radio-inline"><input type="radio" name="format" value="json" checked> JSON</label>
-					<label class="radio-inline"><input type="radio" name="format" value="rss"> RSS</label>
+					<label class="radio-inline"><input type="radio" name="format" ng-model="format" value="json"> JSON</label>
+					<label class="radio-inline"><input type="radio" name="format" ng-model="format" value="rss"> RSS</label>
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="col-sm-2 control-label">Limit</label>
 				<div class="col-sm-10">
-					<input type="number" max="100" min="1" value="20" name="limit" class="form-control">
+					<input type="number" max="100" min="1" name="limit" class="form-control" ng-model="limit">
 					<span class="help-block">Between 1 to 100. Default to 20.</span>
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="col-sm-2 control-label">Manga Filters</label>
 				<div class="col-sm-10">
-					<input type="text" name="filter" class="form-control">
+					<input type="text" name="filter" class="form-control" ng-model='filter'>
 					<ul class="help-block">
 						<li>E.g.: <samp><b>naruto,bleach,one-piece</b></samp> will only list latest Naruto, Bleach and One Piece chapters. Comma-separated.</li>
 						<li>Each value will be matched against the URL slugs of the manga pages on mangareader.net. E.g.:
@@ -60,8 +60,7 @@ samp b{
 			</div>
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-10">
-					<button class="btn btn-primary">Generate URL</button>&nbsp;&nbsp;&nbsp;
-					<button type="reset" class="btn">Reset</button>
+					<button class="btn btn-primary" type='submit'>Open URL</button>
 				</div>
 			</div>
 		</form>
@@ -71,28 +70,25 @@ samp b{
 	</footer>
 </div>
 <script src="//cdnjs.cloudflare.com/ajax/libs/zepto/1.0rc1/zepto.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular.min.js"></script>
 <script>
-var $form = $('#generate-form'),
-	$generatedURL = $('#generated-url');
-$form.submit(function(e){
-	e.preventDefault();
-	var data = $form.serializeArray(),
-		format = 'json',
-		params = null;
-	for (var i=0, l=data.length; i<l; i++){
-		var d = data[i],
-			name = d.name,
-			value = d.value;
-		if (name){
-			if (name == 'format'){
-				format = value;
-			} else if ((name == 'limit' && value && value != '20') || (name == 'filter' && value)){
-				if (!params) params = {};
-				params[name] = value;
+	var app = angular.module("MangaFeeder", []);
+	app.controller("FormController", ["$scope", function($scope){
+		$scope.url = 'http://' + location.host + '/latest.';
+		$scope.format = 'json';
+		$scope.limit = 20;
+		$scope.link = function(){
+			var value = $scope.url + $scope.format + '?' + 'limit=' + $scope.limit;
+			if($scope.filter){
+				value += '&filter=' + $scope.filter;
 			}
-		}
-	}
-	var url = 'http://' + location.host + '/latest.' + format + (params ? '?' + $.param(params) : '');
-	$generatedURL.text(url).attr('href', url);
-}).submit();
+			return value;
+		};
+	}]);
+</script>
+<script>
+	$("#generate-form").submit(function(){
+		event.preventDefault();
+		window.open($("#generated-url").attr('href'), "_blank");
+	});
 </script>
