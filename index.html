@@ -79,6 +79,7 @@ $form.submit(function(e){
 	window.open($generatedURL.attr('href'), '_blank');
 });
 $form.on('input', updateURL);
+$form.on('change', updateURL);
 $form.on('reset', function(){
 	setTimeout(updateURL, 1);
 });
