@@ -60,7 +60,7 @@ samp b{
 			</div>
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-10">
-					<button class="btn btn-primary">Generate URL</button>&nbsp;&nbsp;&nbsp;
+					<button class="btn btn-primary">Go To Generated URL</button>&nbsp;&nbsp;&nbsp;
 					<button type="reset" class="btn">Reset</button>
 				</div>
 			</div>
@@ -76,6 +76,13 @@ var $form = $('#generate-form'),
 	$generatedURL = $('#generated-url');
 $form.submit(function(e){
 	e.preventDefault();
+	window.open($generatedURL.attr('href'), '_blank');
+});
+$form.on('input', updateURL);
+$form.on('reset', function(){
+	setTimeout(updateURL, 1)
+});
+function updateURL(){
 	var data = $form.serializeArray(),
 		format = 'json',
 		params = null;
@@ -94,5 +101,6 @@ $form.submit(function(e){
 	}
 	var url = 'http://' + location.host + '/latest.' + format + (params ? '?' + $.param(params) : '');
 	$generatedURL.text(url).attr('href', url);
-}).submit();
+}
+updateURL();
 </script>
