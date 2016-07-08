@@ -80,7 +80,7 @@ $form.submit(function(e){
 });
 $form.on('input', updateURL);
 $form.on('reset', function(){
-	setTimeout(updateURL, 1)
+	setTimeout(updateURL, 1);
 });
 function updateURL(){
 	var data = $form.serializeArray(),
